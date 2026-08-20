@@ -1,10 +1,11 @@
 (function () {
   "use strict";
   var MAIN_LIVE = "https://tianming332.github.io/JiangmingTian_Portfolio_Final/";
-  var local = location.protocol === "file:" || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   var parts = decodeURIComponent(location.pathname).split("/").filter(Boolean);
-  var projectId = parts.length > 1 ? parts[parts.length - 2] : "";
-  var dataBase = local ? "../../JiangmingTian_Portfolio_Final/data/" : MAIN_LIVE + "data/";
+  var lastPart = parts[parts.length - 1] || "";
+  var projectFolder = /\.html?$/i.test(lastPart) ? (parts[parts.length - 2] || "") : lastPart;
+  var projectId = projectFolder.replace(/^TIAN-/i, "").toLowerCase();
+  var dataBase = MAIN_LIVE + "data/";
 
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
@@ -80,7 +81,7 @@
     document.querySelectorAll("[data-detail-id]").forEach(function (link) {
       var id = link.dataset.detailId;
       var record = window.WORK_DETAIL_LINKS && window.WORK_DETAIL_LINKS[id];
-      link.href = local ? ("../" + id + "/index.html") : (record && record.live || (MAIN_LIVE + "?from=project#all-works"));
+      link.href = record && record.live || (MAIN_LIVE + "?from=project#all-works");
     });
   }
 
@@ -90,6 +91,6 @@
     .then(function () { return loadScript(dataBase + "work-detail-links.js"); })
     .then(function () { renderTaxonomy(); updateProjectLinks(); })
     .catch(function () {
-      if (!local) document.querySelectorAll("[data-detail-id]").forEach(function (link) { link.href = MAIN_LIVE + "?from=project#all-works"; });
+      document.querySelectorAll("[data-detail-id]").forEach(function (link) { link.href = MAIN_LIVE + "?from=project#all-works"; });
     });
 }());
